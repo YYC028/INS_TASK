@@ -225,6 +225,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>tempPWM</ItemText>
         </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>gyrooffset</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cnt</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

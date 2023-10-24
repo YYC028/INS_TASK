@@ -27,7 +27,32 @@ Project File Date:  10/13/2023
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'INS_TASK'
-"INS_TASK\INS_TASK.axf" - 0 Error(s), 0 Warning(s).
+compiling INS_task.c...
+../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h(68): warning:  #47-D: incompatible redefinition of macro "__FPU_PRESENT" 
+  #define __FPU_PRESENT             1U       /*!< FPU present                                   */
+../Drivers/CMSIS/Include/core_cm4.h(79): warning:  #47-D: incompatible redefinition of macro "__FPU_USED" 
+        #define __FPU_USED       1U
+..\Src\INS_task.c(251): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      *yaw = atan2f(2.0f*(q[0]*q[3]+q[1]*q[2]), 2.0f*(q[0]*q[0]+q[1]*q[1])-1.0f) *57.3;
+..\Src\INS_task.c(252): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      *pitch = asinf(-2.0f*(q[1]*q[3]-q[0]*q[2])) *57.3;
+..\Src\INS_task.c(253): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      *roll = atan2f(2.0f*(q[0]*q[1]+q[2]*q[3]),2.0f*(q[0]*q[0]+q[3]*q[3])-1.0f) *57.3;
+..\Src\INS_task.c(262): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	   gyrooffset[0]-=bmi088_real_data.gyro[0]*0.00005;
+..\Src\INS_task.c(263): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		 gyrooffset[1]-=bmi088_real_data.gyro[1]*0.00005;
+..\Src\INS_task.c(264): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		 gyrooffset[2]-=bmi088_real_data.gyro[2]*0.00005;
+..\Src\INS_task.c(134): warning:  #177-D: variable "timing_time"  was declared but never referenced
+  static const float timing_time = 0.001f;   //tast run time , unit s.任务运行的时间 单位 s
+..\Src\INS_task.c(151): warning:  #177-D: variable "gyro_offset"  was declared but never referenced
+  static fp32 gyro_offset[3]={0.00183875614,0.00254813489,0.00360821653};  
+..\Src\INS_task.c: 10 warnings, 0 errors
+linking...
+Program Size: Code=23306 RO-data=574 RW-data=336 ZI-data=18432  
+FromELF: creating hex file...
+"INS_TASK\INS_TASK.axf" - 0 Error(s), 10 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +76,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.6.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

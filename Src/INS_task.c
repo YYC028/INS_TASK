@@ -38,8 +38,8 @@
 #define IMU_temp_PWM(pwm)  imu_pwm_set(pwm)                    //pwm给定
 
 #define BMI088_BOARD_INSTALL_SPIN_MATRIX    \
+    {1.0f, 0.0f, 0.0f},                     \
     {0.0f, 1.0f, 0.0f},                     \
-    {-1.0f, 0.0f, 0.0f},                     \
     {0.0f, 0.0f, 1.0f}                      \
 
 
@@ -141,14 +141,14 @@ static fp32 accel_fliter_3[3] = {0.0f, 0.0f, 0.0f};
 static const fp32 fliter_num[3] = {1.929454039488895f, -0.93178349823448126f, 0.002329458745586203f};
 
 
-fp32 ins_angle_degree[3];
 
+fp32  gyrooffset[3];
  fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
  fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
  fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
  fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.欧拉角 单位 rad
-static fp32 gyro_offset[3]={0.00183875614,0.00254813489,0.00360821653};  
+fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};    
+ 
 
 volatile float twoKp = 1.0;											// 2 * proportional gain (Kp)
 volatile float twoKi = 0;											// 2 * integral gain (Ki)
@@ -246,10 +246,25 @@ void MahonyAHRSupdateIMU(float q[4], float gx, float gy, float gz, float ax, flo
 
 void get_angle(const fp32 q[4], fp32 *yaw, fp32 *pitch, fp32 *roll)
 {
+	
+	
     *yaw = atan2f(2.0f*(q[0]*q[3]+q[1]*q[2]), 2.0f*(q[0]*q[0]+q[1]*q[1])-1.0f) *57.3;
     *pitch = asinf(-2.0f*(q[1]*q[3]-q[0]*q[2])) *57.3;
     *roll = atan2f(2.0f*(q[0]*q[1]+q[2]*q[3]),2.0f*(q[0]*q[0]+q[3]*q[3])-1.0f) *57.3;
 }
+
+void INS_gyrooffset_calculate()
+{
+ int cnt =0;
+	while(cnt ++ < 20000)
+	{
+	   BMI088_read(bmi088_real_data.gyro, bmi088_real_data.accel, &bmi088_real_data.temp);
+	   gyrooffset[0]-=bmi088_real_data.gyro[0]*0.00005;
+		 gyrooffset[1]-=bmi088_real_data.gyro[1]*0.00005;
+		 gyrooffset[2]-=bmi088_real_data.gyro[2]*0.00005;
+	}
+}
+
 
 
 /**
@@ -271,6 +286,7 @@ void INS_task(void const *pvParameters)
 
 
     BMI088_read(bmi088_real_data.gyro, bmi088_real_data.accel, &bmi088_real_data.temp);
+		INS_gyrooffset_calculate();
     //rotate and zero drift 
     imu_cali_slove(INS_gyro, INS_accel, &bmi088_real_data);
 
@@ -369,7 +385,7 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t *bmi0
 {
     for (uint8_t i = 0; i < 3; i++)
     {
-        gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
+        gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] + gyrooffset[i];
         accel[i] = bmi088->accel[0] * accel_scale_factor[i][0] + bmi088->accel[1] * accel_scale_factor[i][1] + bmi088->accel[2] * accel_scale_factor[i][2] + accel_offset[i];
     }
 }
